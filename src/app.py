@@ -88,37 +88,62 @@ def create_heatmap(underlying, vol, close):
 def style_df(styler):
     styler.background_gradient(axis=None, cmap='plasma')
     styler.format(precision=2)
+    styler.format_index(precision=2)
     return styler
 
 def style_df_pnl(styler):
     styler.background_gradient(axis=None, cmap='RdYlGn', vmin=-10, vmax=10)
     styler.format(precision=2)
+    styler.format_index(precision=2)
     return styler
 
-def show_heatmap(call_grid, put_grid):
-    pd.set_option('display.float_format', '{:.2f}'.format)
-    st.subheader("Call Option")
-    st.dataframe(call_grid.style.pipe(style_df), selection_mode='single-cell')
-    st.subheader("Put Option")
-    st.dataframe(put_grid.style.pipe(style_df), selection_mode='single-cell')
+def show_heatmap(call_grid, put_grid, pnl: bool, cost):
+    """
+    Displays the Option Price Heatmap onto the screen.
+    If pnl = True, displays the Profit and Loss instead of Option Prices
+    """
+    if not pnl:
+        st.subheader("Call Option")
+        st.table(call_grid.style.pipe(style_df), border=False)
+        st.subheader("Put Option")
+        st.table(put_grid.style.pipe(style_df), border=False)
+    else:
+        st.subheader("Call Option")
+        call_grid = call_grid - cost
+        st.table(call_grid.style.pipe(style_df_pnl), border=False)
+        st.subheader("Put Option")
+        put_grid = put_grid - cost
+        st.table(put_grid.style.pipe(style_df_pnl), border=False)
 
 def main():
 
-    st.title('Black-Scholes Option Heatmap')
+    st.title("Black-Scholes Option Heatmap")
+
+    # SIDEBAR UI
     ticker_df = get_tickers()
     tickers = ticker_df.loc[:, 'Ticker']
     ticker_df = ticker_df.set_index('Ticker')
-
     ticker_select = st.sidebar.selectbox(
         'Ticker',
         tickers,
     )
+
     close = ticker_df.loc[ticker_select, '5-day Average Close']
     underlying = st.sidebar.slider('Underlying Price', 0.0, ticker_df.loc[ticker_select, 'Upper Bound'], (close))
+
     volatility = st.sidebar.slider('Implied Volatility', 0.0, 3.0, (1.0))
-    call_grid, put_grid = create_heatmap(underlying, volatility, close)
+
     
-    show_heatmap(call_grid, put_grid)
+
+    # MAIN UI
+    pnl = st.checkbox('PnL Heatmap', value=False)
+
+    # SIDEBAR UI REQUIRING VALUE OF PNL
+    cost = st.sidebar.slider('Cost of Option', 0.0, 100.0, (0.0), disabled=not pnl)
+
+    # MAIN UI
+    call_grid, put_grid = create_heatmap(underlying, volatility, close)
+    show_heatmap(call_grid, put_grid, pnl, cost)
 
 if __name__ == "__main__":
     main()
