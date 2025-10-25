@@ -1,12 +1,9 @@
 import streamlit as st
-from st_aggrid import AgGrid, GridOptionsBuilder
 import pandas as pd
 import numpy as np
 import os
 from pathlib import Path
 from scipy.stats import norm
-import matplotlib.pyplot as plt
-import seaborn as sns
 import warnings
 
 warnings.filterwarnings('ignore', category=RuntimeWarning)
