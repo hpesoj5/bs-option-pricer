@@ -8,7 +8,7 @@ This project is solely for me to **understand more about the Black-Scholes equat
 - volatility
 - risk-free rate
 
-The app is available on https://hpesoj-bs-option-pricer.streamlit.app/. The Python version used in this repo is 3.12.12.
+The app is available on https://hpesoj-bs-option-pricer.streamlit.app/. The Python version used in this repo is 3.12.12. Users are encouraged to view the app maximised or fullscreen for the heatmaps to show fully without having to scroll.
 
 ## App Usage
 
